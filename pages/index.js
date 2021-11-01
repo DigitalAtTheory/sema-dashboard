@@ -86,7 +86,7 @@ export default function Home({ events }) {
           SEMA 2021
         </h1>
       </div>
-      <div className="px-4 max-w-2xl mx-auto">
+      <div className="px-4 max-w-3xl mx-auto">
         <div>
           <CustomChart dataset={events} />
         </div>
