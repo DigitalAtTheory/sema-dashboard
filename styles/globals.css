@@ -8,3 +8,7 @@
   background-repeat: no-repeat;
   background-position: 0px 88%;
 }
+
+.avoidingPurge {
+  @apply bg-red-500;
+}
