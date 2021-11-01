@@ -94,25 +94,25 @@ export default function Home({ events }) {
           <h2 className="uppercase bg-red-100 max-w-max px-2 rounded-full text-red-700 mb-4">
             Corvette
           </h2>
-          <EventStats color="red" tables={events.corvette} />
+          <EventStats color="bg-red-500" tables={events.corvette} />
         </div>
         <div className="mb-6">
           <h2 className="uppercase bg-blue-100 max-w-max px-2 rounded-full text-blue-700 mb-4">
             Porsche
           </h2>
-          <EventStats color="blue" tables={events.porsche} />
+          <EventStats color="bg-blue-500" tables={events.porsche} />
         </div>
         <div className="mb-6">
           <h2 className="uppercase bg-green-100 max-w-max px-2 rounded-full text-green-700 mb-4">
             Toyota
           </h2>
-          <EventStats color="green" tables={events.toyota} />
+          <EventStats color="bg-green-500" tables={events.toyota} />
         </div>
         <div className="mb-6">
           <h2 className="uppercase bg-yellow-100 max-w-max px-2 rounded-full text-yellow-700 mb-4">
             Mobil 1 Golden Ticket
           </h2>
-          <EventStats color="yellow" tables={events.goldenticket} />
+          <EventStats color="bg-yellow-500" tables={events.goldenticket} />
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@ export default function EventStats({ tables, color }) {
           className="flex items-center gap-4 shadow-md rounded-lg bg-white py-5 px-4"
           key={table.key}
         >
-          <div className={`bg-${color}-500 p-3 rounded-md`}>
+          <div className={`${color} p-3 rounded-md`}>
             {i === 0 && <LocationMarkerIcon className="w-6 h-6 text-white" />}
             {i === 1 && <DesktopComputerIcon className="w-6 h-6 text-white" />}
           </div>
