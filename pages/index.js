@@ -1,118 +1,142 @@
+import { useState, useEffect } from "react";
 import Head from "next/head";
-import Airtable from "airtable";
-import EventStats from "../components/EventStats";
-import { v4 as uuidv4 } from "uuid";
-import CustomChart from "../components/CustomChart";
+import {
+  rosiePhysical,
+  rosieVirtual,
+  hoonPhysical,
+  hoonVirtual,
+  stoutPhysical,
+  stoutVirtual,
+} from "../firebase/db";
+import { getDocs, onSnapshot } from "firebase/firestore";
+
+import EventCard from "../components/EventCard";
 
 export async function getServerSideProps(context) {
-  Airtable.configure({
-    endpointUrl: "https://api.airtable.com",
-    apiKey: process.env.AIRTABLE_API_KEY,
-  });
+  const rosiePData = await getData(rosiePhysical);
+  const rosieVData = await getData(rosieVirtual);
+  const stoutPData = await getData(stoutPhysical);
+  const stoutVData = await getData(stoutVirtual);
+  const hoonPData = await getData(hoonPhysical);
+  const hoonVData = await getData(hoonVirtual);
 
-  const corvette = Airtable.base(process.env.CORVETTE_BASE);
-  const porsche = Airtable.base(process.env.PORSCHE_BASE);
-  const toyota = Airtable.base(process.env.TOYOTA_BASE);
-  const goldenticket = Airtable.base(process.env.GOLDENTICKET_BASE);
+  async function getData(ref) {
+    const snapshot = await getDocs(ref);
+    const data = snapshot.docs.map((doc) => doc.data());
 
-  const corvettePhysical = await corvette("Physical").select().all();
-  const corvetteDigital = await corvette("Digital").select().all();
-  const porscheDigital = await porsche("Digital").select().all();
-  const porschePhysical = await porsche("Physical").select().all();
-  const toyotaPhysical = await toyota("Physical").select().all();
-  const toyotaDigital = await toyota("Digital").select().all();
-  const goldenticketEntries = await goldenticket("Entries").select().all();
-
-  const allRecords = {
-    corvette: [
-      {
-        name: "On-Site",
-        records: JSON.stringify(corvettePhysical),
-        key: uuidv4(),
-      },
-      {
-        name: "Virtual",
-        records: JSON.stringify(corvetteDigital),
-        key: uuidv4(),
-      },
-    ],
-    porsche: [
-      {
-        name: "On-Site",
-        records: JSON.stringify(porschePhysical),
-        key: uuidv4(),
-      },
-      {
-        name: "Virtual",
-        records: JSON.stringify(porscheDigital),
-        key: uuidv4(),
-      },
-    ],
-    toyota: [
-      {
-        name: "On-Site",
-        records: JSON.stringify(toyotaPhysical),
-        key: uuidv4(),
-      },
-      {
-        name: "Virtual",
-        records: JSON.stringify(toyotaDigital),
-        key: uuidv4(),
-      },
-    ],
-    goldenticket: [
-      {
-        name: "On-Site",
-        records: JSON.stringify(goldenticketEntries),
-        key: uuidv4(),
-      },
-    ],
-  };
+    return data;
+  }
   return {
     props: {
-      events: allRecords,
+      rosiePData,
+      rosieVData,
+      stoutPData,
+      stoutVData,
+      hoonPData,
+      hoonVData,
     },
   };
 }
 
-export default function Home({ events }) {
+export default function Home({
+  rosiePData,
+  rosieVData,
+  stoutPData,
+  stoutVData,
+  hoonPData,
+  hoonVData,
+}) {
+  const [rosieP, setRosieP] = useState(rosiePData);
+  const [rosieV, setRosieV] = useState(rosieVData);
+  const [stoutP, setStoutP] = useState(stoutPData);
+  const [stoutV, setStoutV] = useState(stoutVData);
+  const [hoonP, setHoonP] = useState(hoonPData);
+  const [hoonV, setHoonV] = useState(hoonVData);
+
+  useEffect(() => {
+    const rosiePUnsub = onSnapshot(rosiePhysical, (querySnapshot) => {
+      setRosieP(querySnapshot.docs.map((doc) => doc.data()));
+    });
+    const rosieVUnsub = onSnapshot(rosieVirtual, (querySnapshot) => {
+      setRosieV(querySnapshot.docs.map((doc) => doc.data()));
+    });
+    const stoutPUnsub = onSnapshot(stoutPhysical, (querySnapshot) => {
+      setStoutP(querySnapshot.docs.map((doc) => doc.data()));
+    });
+    const stoutVUnsub = onSnapshot(stoutVirtual, (querySnapshot) => {
+      setStoutV(querySnapshot.docs.map((doc) => doc.data()));
+    });
+    const hoonPUnsub = onSnapshot(hoonPhysical, (querySnapshot) => {
+      setHoonP(querySnapshot.docs.map((doc) => doc.data()));
+    });
+    const hoonVUnsub = onSnapshot(hoonVirtual, (querySnapshot) => {
+      setHoonV(querySnapshot.docs.map((doc) => doc.data()));
+    });
+
+    return () => {
+      rosiePUnsub();
+      rosieVUnsub();
+      stoutPUnsub();
+      stoutVUnsub();
+      hoonPUnsub();
+      hoonVUnsub();
+    };
+  }, []);
+
   return (
     <div>
       <Head>
-        <title>Dashboard - Unconventionally Driven</title>
+        <title>Dashboard - SEMA</title>
       </Head>
       <div className="bg-black py-5 mb-4">
         <h1 className="text-3xl text-center text-white customUnderline max-w-max mx-auto">
-          SEMA 2021
+          SEMA 2022
         </h1>
       </div>
-      <div className="px-4 max-w-3xl mx-auto">
-        <div>
-          <CustomChart dataset={events} />
-        </div>
-        <div className="mb-6">
-          <h2 className="uppercase bg-red-100 max-w-max px-2 rounded-full text-red-700 mb-4">
-            Corvette
+      <div className="max-w-5xl px-4 mx-auto">
+        <div className="mb-12 md:mb-0">
+          <h2 className="font-bold uppercase bg-red-100 max-w-max px-2 rounded-full text-red-700 mb-4">
+            Virtual Entries
           </h2>
-          <EventStats color="bg-red-500" tables={events.corvette} />
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8  md:gap-12">
+            <EventCard
+              letter="R"
+              title="Rosie"
+              numberOfEntries={rosieV.length}
+            />
+            <EventCard
+              letter="S"
+              title="Stout"
+              numberOfEntries={stoutV.length}
+            />
+            <EventCard
+              letter="H"
+              title="Hoonipigasus"
+              numberOfEntries={hoonV.length}
+            />
+          </div>
         </div>
-        <div className="mb-6">
-          <h2 className="uppercase bg-blue-100 max-w-max px-2 rounded-full text-blue-700 mb-4">
-            Porsche
+        <div className="mb-12 md:mb-0">
+          <h2 className="font-bold uppercase bg-blue-100 max-w-max px-2 rounded-full text-blue-700 mb-4">
+            On-site Entries
           </h2>
-          <EventStats color="bg-blue-500" tables={events.porsche} />
-        </div>
-        <div className="mb-6">
-          <h2 className="uppercase bg-green-100 max-w-max px-2 rounded-full text-green-700 mb-4">
-            Toyota
-          </h2>
-          <EventStats color="bg-green-500" tables={events.toyota} />
-        </div>
-        <div className="mb-6">
-          <h2 className="uppercase bg-yellow-100 max-w-max px-2 rounded-full text-yellow-700 mb-4">
-            Mobil 1 Golden Ticket
-          </h2>
-          <EventStats color="bg-yellow-500" tables={events.goldenticket} />
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8  md:gap-12">
+            <EventCard
+              letter="R"
+              title="Rosie"
+              numberOfEntries={rosieP.length}
+            />
+            <EventCard
+              letter="S"
+              title="Stout"
+              numberOfEntries={stoutP.length}
+            />
+            <EventCard
+              letter="H"
+              title="Hoonipigasus"
+              numberOfEntries={hoonP.length}
+            />
+          </div>
         </div>
       </div>
     </div>
